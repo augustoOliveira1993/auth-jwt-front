@@ -4,7 +4,7 @@ export default [
         name: 'error-404',
         component: () => import('@/views/error/Error404.vue'),
         meta: {
-          layout: 'full',
+            layout: 'full',
         },
-      },
+    },
 ]

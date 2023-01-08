@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 // Routes
-import { canNavigate } from '@/libs/acl/routeProtection'
 import { isUserLoggedIn, getUserData, getHomeRouteForLoggedInUser } from '@/auth/utils'
 import home from './routes/home'
 import login from './routes/login'
@@ -33,20 +32,18 @@ const router = new VueRouter({
 router.beforeEach((to, _, next) => {
   const isLoggedIn = isUserLoggedIn()
 
-  if (!canNavigate(to)) {
+  if (to.meta.requiresAuth && !isLoggedIn) {
     // Redirect to login if not logged in
     if (!isLoggedIn) return next({ name: 'auth-login' })
 
     // If logged in => not authorized
-    return next({ name: 'authorized' })
+    return next({ name: 'auth-login' })
   }
 
   // Redirect if logged in
   if (to.meta.redirectIfLoggedIn && isLoggedIn) {
     const userData = getUserData()
-  
-    console.log('userData', (userData ? userData.user_ativo : 0));
-    next(getHomeRouteForLoggedInUser(userData ? userData.user_ativo : 0))
+    next(getHomeRouteForLoggedInUser(userData ? userData.user_rule : null))
   }
 
   return next()

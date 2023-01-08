@@ -21,8 +21,7 @@ export const getUserData = () => JSON.parse(localStorage.getItem('userData'))
  * @param {String} user_ativo Role of user
  */
 export const getHomeRouteForLoggedInUser = user_ativo => {
-  console.log('user_ativo', typeof user_ativo);
-  if (user_ativo === 1) return '/'
-  if (user_ativo === 0 ) return { name: 'second-page' }
+  if (user_ativo === 'client') return '/'
+  if (user_ativo === 'admin' ) return { name: 'second-page' }
   return { name: 'auth-login' }
 }

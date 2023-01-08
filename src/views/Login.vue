@@ -4,7 +4,7 @@
 
       <!-- Brand logo-->
       <b-link class="brand-logo">
-        <vuexy-logo />
+        <vuexy-logo/>
         <h2 class="brand-text text-primary ml-1">
           Vuexy
         </h2>
@@ -14,7 +14,7 @@
       <!-- Left Text-->
       <b-col lg="8" class="d-none d-lg-flex align-items-center p-5">
         <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
-          <b-img fluid :src="imgUrl" alt="Login V2" />
+          <b-img fluid :src="imgUrl" alt="Login V2"/>
         </div>
       </b-col>
       <!-- /Left Text-->
@@ -39,7 +39,7 @@
               </p>
             </div>
             <feather-icon v-b-tooltip.hover.left="'This is just for ACL demo purpose'" icon="HelpCircleIcon" size="18"
-              class="position-absolute" style="top: 10; right: 10;" />
+                          class="position-absolute" style="top: 10px; right: 10px;"/>
           </b-alert>
 
           <!-- form -->
@@ -49,7 +49,7 @@
               <b-form-group label="Email" label-for="login-email">
                 <validation-provider #default="{ errors }" name="Email" vid="email" rules="required|email">
                   <b-form-input id="login-email" v-model="userEmail" :state="errors.length > 0 ? false : null"
-                    name="login-email" placeholder="john@example.com" />
+                                name="login-email" placeholder="john@example.com"/>
                   <small class="text-danger">{{ errors[0] }}</small>
                 </validation-provider>
               </b-form-group>
@@ -65,11 +65,11 @@
                 <validation-provider #default="{ errors }" name="Password" vid="password" rules="required">
                   <b-input-group class="input-group-merge" :class="errors.length > 0 ? 'is-invalid' : null">
                     <b-form-input id="login-password" v-model="password" :state="errors.length > 0 ? false : null"
-                      class="form-control-merge" :type="passwordFieldType" name="login-password"
-                      placeholder="Password" />
+                                  class="form-control-merge" :type="passwordFieldType" name="login-password"
+                                  placeholder="Password"/>
                     <b-input-group-append is-text>
                       <feather-icon class="cursor-pointer" :icon="passwordToggleIcon"
-                        @click="togglePasswordVisibility" />
+                                    @click="togglePasswordVisibility"/>
                     </b-input-group-append>
                   </b-input-group>
                   <small class="text-danger">{{ errors[0] }}</small>
@@ -142,16 +142,30 @@
 
 <script>
 /* eslint-disable global-require */
-import { ValidationProvider, ValidationObserver } from 'vee-validate'
+import {ValidationProvider, ValidationObserver} from 'vee-validate'
 import VuexyLogo from '@core/layouts/components/Logo.vue'
 import {
-  BRow, BCol, BLink, BFormGroup, BFormInput, BInputGroupAppend, BInputGroup, BFormCheckbox, BCardText, BCardTitle, BImg, BForm, BButton, BAlert, VBTooltip,
+  BRow,
+  BCol,
+  BLink,
+  BFormGroup,
+  BFormInput,
+  BInputGroupAppend,
+  BInputGroup,
+  BFormCheckbox,
+  BCardText,
+  BCardTitle,
+  BImg,
+  BForm,
+  BButton,
+  BAlert,
+  VBTooltip,
 } from 'bootstrap-vue'
 import useJwt from '@/auth/jwt/useJwt'
-import { required, email } from '@validations'
-import { togglePasswordVisibility } from '@core/mixins/ui/forms'
+import {required, email} from '@validations'
+import {togglePasswordVisibility} from '@core/mixins/ui/forms'
 import store from '@/store/index'
-import { getHomeRouteForLoggedInUser } from '@/auth/utils'
+import {getHomeRouteForLoggedInUser} from '@/auth/utils'
 
 import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
 
@@ -204,8 +218,8 @@ export default {
     },
   },
   methods: {
-   async login() {
-    await this.$refs.loginForm.validate().then(success => {
+    async login() {
+      await this.$refs.loginForm.validate().then(success => {
 
         if (success) {
           useJwt.loginteste({
@@ -213,42 +227,56 @@ export default {
 
             password: this.password,
           })
-            .then(response => response.json())
-            .then(response => {
+              .then(response => response.json())
+              .then(response => {
 
-              const { userData } = response
-              console.log('response', response);
-              useJwt.setToken(response.accessToken)
-              useJwt.setRefreshToken(response.refreshToken)
-              localStorage.setItem('userData', JSON.stringify(userData))
-              
-              this.$ability.update(userData.user_ativo)
+                const {userData} = response
+                // Ability Admin
+                // userData.ability = [
+                //   {
+                //     "action": "manage",
+                //     "subject": "all"
+                //   }
+                // ]
+                // Ability Cliente
+                userData.ability = [
+                  {
+                    action: 'read',
+                    subject: 'ACL',
+                  },
+                  {
+                    action: 'read',
+                    subject: 'Auth',
+                  },
+                ]
+                useJwt.setToken(response.accessToken)
+                useJwt.setRefreshToken(response.refreshToken)
+                localStorage.setItem('userData', JSON.stringify(userData))
 
-               this.$router.replace(getHomeRouteForLoggedInUser(userData.user_ativo))
-
-                .then((resp) => {
-                  console.log('resp',resp);
-                  this.$toast({
-                    component: ToastificationContent,
-                    position: 'top-right',
-                    props: {
-                      title: `Welcome ${userData.user_name || userData.user_sobrenome}`,
-                      icon: 'CoffeeIcon',
-                      variant: 'success',
-                      text: `You have successfully logged in as ${userData.user_ativo}. Now you can start to explore!`,
-                    },
-                  })
-                })
-            })
-            .catch(error => {
-              console.log('err',error);
-              // this.$refs.loginForm.setErrors(error.response.error)
-            })
+                this.$router.replace(getHomeRouteForLoggedInUser(userData.user_rule))
+                    .then((resp) => {
+                      console.log('resp', resp);
+                      this.$toast({
+                        component: ToastificationContent,
+                        position: 'top-right',
+                        props: {
+                          title: `Welcome ${userData.user_name || userData.user_sobrenome}`,
+                          icon: 'CoffeeIcon',
+                          variant: 'success',
+                          text: `You have successfully logged in as ${userData.user_ativo}. Now you can start to explore!`,
+                        },
+                      })
+                    })
+              })
+              .catch(error => {
+                console.log('err', error);
+                // this.$refs.loginForm.setErrors(error.response.error)
+              })
         }
       })
 
     },
-  
+
 
   },
 }
